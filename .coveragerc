@@ -1,0 +1,9 @@
+[run]
+source = nephthys
+
+[report]
+fail_under = 100
+show_missing = True
+
+[paths]
+source = nephthys

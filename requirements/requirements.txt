@@ -1,0 +1,2 @@
+webob<2
+python-rapidjson<1

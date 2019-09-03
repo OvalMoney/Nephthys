@@ -1,0 +1,13 @@
+[flake8]
+exclude =
+    __pycache__/,
+    *.py[cod],
+    *.egg-info/,
+    .pytest_cache/,
+    htmlcov/,
+    files/,
+    .idea/
+filename =
+    *.py
+max-complexity = 22
+max-line-length = 120

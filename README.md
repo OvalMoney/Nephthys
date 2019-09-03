@@ -1,2 +1,2 @@
-# horus
+# Nephthys
 Advanced Python Logging
