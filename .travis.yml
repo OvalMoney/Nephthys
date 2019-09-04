@@ -1,16 +1,30 @@
 sudo: false
 language: python
+cache: pip
+
+stages:
+  - test
+  - deploy
 
 python:
   - "3.6"
   - "3.7"
 
-install: pip install tox-travis tox
+install:
+  - pip install --upgrade setuptools
+  - pip install tox-travis tox
 script: tox
-deploy:
-  provider: pypi
-  user: $PYPI_USER
-  password: $PYPI_PASSWORD
-  on:
-    tags: true
-  skip_existing: true
+
+jobs:
+  include:
+    - stage: deploy
+      python: 3.7
+      install:
+        - pip install --upgrade setuptools
+      deploy:
+        provider: pypi
+        user: $PYPI_USER
+        password: $PYPI_PASSWORD
+        on:
+          tags: true
+        skip_existing: true
