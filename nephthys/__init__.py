@@ -5,42 +5,46 @@ from urllib.parse import urlparse
 
 
 class BaseLoggerAdapter(LoggerAdapter):
-
     def __init__(self, logger, extra_tags=None, *args, **kwargs):
         self._extra_tags = extra_tags or []
         self._extra_tags.append(logger.name)
 
-    def process(self, msg, kwargs):
+    def _process(self, msg):
+        if isinstance(msg, str):
+            msg = Log(LogRecord(message=msg))
+
         if isinstance(msg, Log):
             log_rec = msg.log_record
             log_rec.add_tag(self._extra_tags)
 
-            return log_rec.asdict(), kwargs
+        return msg
 
-        return msg, kwargs
+    def process(self, msg, kwargs):
+
+        proc_msg = self._process(msg)
+
+        if isinstance(proc_msg, Log):
+            return proc_msg.log_record.asdict(), kwargs
+
+        return proc_msg, kwargs
 
 
 def apply_filters(log_record, filters):
     for f in filters:
-        if hasattr(f, 'filter'):
+        if hasattr(f, "filter"):
             f.filter(log_record)
         else:
             f(log_record)
 
 
 class FilterLoggerAdapter(BaseLoggerAdapter):
-
     def __init__(self, logger, filters=None, *args, **kwargs):
-        super().__init__(
-            logger=logger,
-            *args,
-            **kwargs
-        )
+        super().__init__(logger=logger, *args, **kwargs)
 
         self._filters = filters or []
 
-    def process(self, msg, kwargs):
-        super().process(msg, kwargs)
+    def _process(self, msg):
+        msg = super()._process(msg)
 
         if isinstance(msg, Log):
             log_rec = msg.log_record
@@ -51,9 +55,7 @@ class FilterLoggerAdapter(BaseLoggerAdapter):
 
             apply_filters(log_rec, filters)
 
-            return log_rec.asdict(), kwargs
-
-        return msg, kwargs
+        return msg
 
     def log(self, level, msg, *args, **kwargs):
         if isinstance(msg, FilterableLog) and msg.drop:
@@ -64,7 +66,7 @@ class FilterLoggerAdapter(BaseLoggerAdapter):
 
 def join_multidict(multi_dict):
     list_dict = multi_dict.dict_of_lists()
-    return {key: ','.join(value) for key, value in list_dict.items()}
+    return {key: ",".join(value) for key, value in list_dict.items()}
 
 
 def add_to_multidict(multi_dict, name, value):
@@ -75,8 +77,7 @@ def add_to_multidict(multi_dict, name, value):
             multi_dict.add(name, val)
 
 
-class Log():
-
+class Log:
     def __init__(self, log_record):
         self._log_record = log_record
 
@@ -86,7 +87,6 @@ class Log():
 
 
 class FilterableLog(Log):
-
     def __init__(self, log_record):
         super().__init__(log_record)
         self.drop = False
@@ -100,29 +100,26 @@ class FilterableLog(Log):
         self._filters.append(record_filter)
 
 
-class LogRecord():
-
-    def __init__(self, extra_tags=None, *args, **kwargs):
+class LogRecord:
+    def __init__(self, message="", extra_tags=None, *args, **kwargs):
         self._extra_tags = extra_tags or []
+        self._message = message
 
     def asdict(self):
-        msg_dict = {
-            "extra_tags": self._extra_tags
-        }
+        msg_dict = {"extra_tags": self._extra_tags, "message": self._message}
 
         return msg_dict
 
     def add_tag(self, tag):
-        self._extra_tags.append(tag)
+        if isinstance(tag, list):
+            self._extra_tags.extend(tag)
+        else:
+            self._extra_tags.append(tag)
 
 
 class RequestLogRecord(LogRecord):
-
     def __init__(self, *args, **kwargs):
-        super().__init__(
-            *args,
-            **kwargs
-        )
+        super().__init__(*args, **kwargs)
 
         self._req_start = None
         self._req_end = None
@@ -170,8 +167,7 @@ class RequestLogRecord(LogRecord):
                 "status_code": self._status_code,
                 "header": join_multidict(self._res_headers),
                 "body": self._res_body,
-            }
-
+            },
         }
 
         return {**base_dict, **req_dict}

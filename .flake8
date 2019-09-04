@@ -6,7 +6,8 @@ exclude =
     .pytest_cache/,
     htmlcov/,
     files/,
-    .idea/
+    .idea/,
+    .tox/
 filename =
     *.py
 max-complexity = 22

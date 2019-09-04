@@ -19,8 +19,7 @@ def filter_headers(filters, headers):
             headers[hf] = HEADER_FILTERED
 
 
-class HeaderFilter():
-
+class HeaderFilter:
     def __init__(self, headers, req_type=RequestType.ALL):
         self._headers = headers
         self._req_type = req_type
@@ -61,8 +60,7 @@ def filter_json_body(s, r):
                 r[k] = JSON_BODY_FILTERED
 
 
-class BodyTypeFilter():
-
+class BodyTypeFilter:
     def __init__(self, allowed_types=None, req_type=RequestType.ALL):
         self._allowed_types = allowed_types or LOGGABLE_TYPES
         self._req_type = req_type
@@ -71,17 +69,24 @@ class BodyTypeFilter():
         if not isinstance(log_record, RequestLogRecord):
             return
 
-        if log_record._req_body and (self._req_type == RequestType.REQUEST or self._req_type == RequestType.ALL):
+        if log_record._req_body and (
+            self._req_type == RequestType.REQUEST or self._req_type == RequestType.ALL
+        ):
             content_type = find_content_type(log_record._req_headers)
-            log_record._req_body = filter_body(log_record._req_body, content_type, self._allowed_types)
+            log_record._req_body = filter_body(
+                log_record._req_body, content_type, self._allowed_types
+            )
 
-        if log_record._res_body and (self._req_type == RequestType.RESPONSE or self._req_type == RequestType.ALL):
+        if log_record._res_body and (
+            self._req_type == RequestType.RESPONSE or self._req_type == RequestType.ALL
+        ):
             content_type = find_content_type(log_record._res_headers)
-            log_record._res_body = filter_body(log_record._res_body, content_type, self._allowed_types)
+            log_record._res_body = filter_body(
+                log_record._res_body, content_type, self._allowed_types
+            )
 
 
-class JsonBodyFilter():
-
+class JsonBodyFilter:
     def __init__(self, body_schema, req_type=RequestType.ALL):
         self._body_schema = body_schema
         self._req_type = req_type
@@ -90,13 +95,17 @@ class JsonBodyFilter():
         if not isinstance(log_record, RequestLogRecord):
             return
 
-        if log_record._req_body and (self._req_type == RequestType.REQUEST or self._req_type == RequestType.ALL):
+        if log_record._req_body and (
+            self._req_type == RequestType.REQUEST or self._req_type == RequestType.ALL
+        ):
             if "application/json" in find_content_type(log_record._req_headers):
                 req_body = rapidjson.loads(log_record._req_body)
                 filter_json_body(self._body_schema, req_body)
                 log_record._req_body = rapidjson.dumps(req_body)
 
-        if log_record._res_body and (self._req_type == RequestType.RESPONSE or self._req_type == RequestType.ALL):
+        if log_record._res_body and (
+            self._req_type == RequestType.RESPONSE or self._req_type == RequestType.ALL
+        ):
             if "application/json" in find_content_type(log_record._res_headers):
                 res_body = rapidjson.loads(log_record._res_body)
                 filter_json_body(self._body_schema, res_body)

@@ -9,10 +9,7 @@ class PrettyFormatter(logging.Formatter):
         indent = kwargs.pop("json_indent", 2)
         self._renderer = JSONRenderer(indent=indent, sort_keys=sort_keys)
 
-        super().__init__(
-            *args,
-            **kwargs,
-        )
+        super().__init__(*args, **kwargs)
 
     def format(self, record):
 

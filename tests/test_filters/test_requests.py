@@ -3,14 +3,21 @@ import pytest
 
 from nephthys import RequestLogRecord, LogRecord
 from nephthys.filters.requests import HeaderFilter, BodyTypeFilter, JsonBodyFilter
-from nephthys.filters.requests import RequestType, HEADER_FILTERED, BODY_NOT_LOGGABLE, JSON_BODY_FILTERED
+from nephthys.filters.requests import (
+    RequestType,
+    HEADER_FILTERED,
+    BODY_NOT_LOGGABLE,
+    JSON_BODY_FILTERED,
+)
 
 
 def rec_generator():
     return LogRecord(extra_tags=["my_tag"])
 
 
-def req_rec_generator(request_headers=None, response_headers=None, request_body=None, response_body=None):
+def req_rec_generator(
+    request_headers=None, response_headers=None, request_body=None, response_body=None
+):
     req_rec = RequestLogRecord()
 
     for name, value in request_headers or []:
@@ -31,66 +38,115 @@ def req_rec_generator(request_headers=None, response_headers=None, request_body=
             ["X-Filter-Me"],
             RequestType.REQUEST,
             req_rec_generator(
-                request_headers=[("X-Filter-Me", "value1"), ("X-Not-Filter-Me", "value2")],
-                response_headers=[("X-Filter-Me", "value1"), ("X-Not-Filter-Me", "value2")]
+                request_headers=[
+                    ("X-Filter-Me", "value1"),
+                    ("X-Not-Filter-Me", "value2"),
+                ],
+                response_headers=[
+                    ("X-Filter-Me", "value1"),
+                    ("X-Not-Filter-Me", "value2"),
+                ],
             ),
             req_rec_generator(
-                request_headers=[("X-Filter-Me", HEADER_FILTERED), ("X-Not-Filter-Me", "value2")],
-                response_headers=[("X-Filter-Me", "value1"), ("X-Not-Filter-Me", "value2")]
+                request_headers=[
+                    ("X-Filter-Me", HEADER_FILTERED),
+                    ("X-Not-Filter-Me", "value2"),
+                ],
+                response_headers=[
+                    ("X-Filter-Me", "value1"),
+                    ("X-Not-Filter-Me", "value2"),
+                ],
             ),
         ),
         (
             ["X-Filter-Me"],
             RequestType.RESPONSE,
             req_rec_generator(
-                request_headers=[("X-Filter-Me", "value1"), ("X-Not-Filter-Me", "value2")],
-                response_headers=[("X-Filter-Me", "value1"), ("X-Not-Filter-Me", "value2")]
+                request_headers=[
+                    ("X-Filter-Me", "value1"),
+                    ("X-Not-Filter-Me", "value2"),
+                ],
+                response_headers=[
+                    ("X-Filter-Me", "value1"),
+                    ("X-Not-Filter-Me", "value2"),
+                ],
             ),
             req_rec_generator(
-                request_headers=[("X-Filter-Me", "value1"), ("X-Not-Filter-Me", "value2")],
-                response_headers=[("X-Filter-Me", HEADER_FILTERED), ("X-Not-Filter-Me", "value2")]
+                request_headers=[
+                    ("X-Filter-Me", "value1"),
+                    ("X-Not-Filter-Me", "value2"),
+                ],
+                response_headers=[
+                    ("X-Filter-Me", HEADER_FILTERED),
+                    ("X-Not-Filter-Me", "value2"),
+                ],
             ),
         ),
         (
             ["X-Filter-Me"],
             RequestType.ALL,
             req_rec_generator(
-                request_headers=[("X-Filter-Me", "value1"), ("X-Not-Filter-Me", "value2")],
-                response_headers=[("X-Filter-Me", "value1"), ("X-Not-Filter-Me", "value2")]
+                request_headers=[
+                    ("X-Filter-Me", "value1"),
+                    ("X-Not-Filter-Me", "value2"),
+                ],
+                response_headers=[
+                    ("X-Filter-Me", "value1"),
+                    ("X-Not-Filter-Me", "value2"),
+                ],
             ),
             req_rec_generator(
-                request_headers=[("X-Filter-Me", HEADER_FILTERED), ("X-Not-Filter-Me", "value2")],
-                response_headers=[("X-Filter-Me", HEADER_FILTERED), ("X-Not-Filter-Me", "value2")]
+                request_headers=[
+                    ("X-Filter-Me", HEADER_FILTERED),
+                    ("X-Not-Filter-Me", "value2"),
+                ],
+                response_headers=[
+                    ("X-Filter-Me", HEADER_FILTERED),
+                    ("X-Not-Filter-Me", "value2"),
+                ],
             ),
         ),
         (
             ["X-Filter-Me"],
             RequestType.ALL,
             req_rec_generator(
-                request_headers=[("X-Filter-Me", "value1"), ("X-Not-Filter-Me", "value2")],
+                request_headers=[
+                    ("X-Filter-Me", "value1"),
+                    ("X-Not-Filter-Me", "value2"),
+                ]
             ),
             req_rec_generator(
-                request_headers=[("X-Filter-Me", HEADER_FILTERED), ("X-Not-Filter-Me", "value2")],
+                request_headers=[
+                    ("X-Filter-Me", HEADER_FILTERED),
+                    ("X-Not-Filter-Me", "value2"),
+                ]
             ),
         ),
         (
             [],
             RequestType.ALL,
             req_rec_generator(
-                request_headers=[("X-Filter-Me", "value1"), ("X-Not-Filter-Me", "value2")],
-                response_headers=[("X-Filter-Me", "value1"), ("X-Not-Filter-Me", "value2")]
+                request_headers=[
+                    ("X-Filter-Me", "value1"),
+                    ("X-Not-Filter-Me", "value2"),
+                ],
+                response_headers=[
+                    ("X-Filter-Me", "value1"),
+                    ("X-Not-Filter-Me", "value2"),
+                ],
             ),
             req_rec_generator(
-                request_headers=[("X-Filter-Me", "value1"), ("X-Not-Filter-Me", "value2")],
-                response_headers=[("X-Filter-Me", "value1"), ("X-Not-Filter-Me", "value2")]
+                request_headers=[
+                    ("X-Filter-Me", "value1"),
+                    ("X-Not-Filter-Me", "value2"),
+                ],
+                response_headers=[
+                    ("X-Filter-Me", "value1"),
+                    ("X-Not-Filter-Me", "value2"),
+                ],
             ),
         ),
-        (
-            ["X-Filter-Me"],
-            RequestType.ALL,
-            rec_generator(),
-            rec_generator(),
-        ),
+        (["X-Filter-Me"], RequestType.ALL, rec_generator(), rec_generator()),
     ],
 )
 def test_header_filter(filters, req_type, in_record, out_record):
@@ -180,12 +236,7 @@ def test_header_filter(filters, req_type, in_record, out_record):
                 request_body="Not-Filter-Me",
             ),
         ),
-        (
-            ["application/json"],
-            RequestType.ALL,
-            rec_generator(),
-            rec_generator(),
-        ),
+        (["application/json"], RequestType.ALL, rec_generator(), rec_generator()),
     ],
 )
 def test_body_type_filter(filters, req_type, in_record, out_record):
@@ -205,13 +256,17 @@ def test_body_type_filter(filters, req_type, in_record, out_record):
             req_rec_generator(
                 request_headers=[("Content-Type", "application/json")],
                 response_headers=[("Content-Type", "application/json")],
-                request_body=rapidjson.dumps({"key": "Filter-Me", "key2": "Not-Filter-Me"}),
+                request_body=rapidjson.dumps(
+                    {"key": "Filter-Me", "key2": "Not-Filter-Me"}
+                ),
                 response_body=rapidjson.dumps({"key": "Not-filter-Me"}),
             ),
             req_rec_generator(
                 request_headers=[("Content-Type", "application/json")],
                 response_headers=[("Content-Type", "application/json")],
-                request_body=rapidjson.dumps({"key": JSON_BODY_FILTERED, "key2": "Not-Filter-Me"}),
+                request_body=rapidjson.dumps(
+                    {"key": JSON_BODY_FILTERED, "key2": "Not-Filter-Me"}
+                ),
                 response_body=rapidjson.dumps({"key": "Not-filter-Me"}),
             ),
         ),
@@ -222,13 +277,17 @@ def test_body_type_filter(filters, req_type, in_record, out_record):
                 request_headers=[("Content-Type", "application/json")],
                 response_headers=[("Content-Type", "application/json")],
                 request_body=rapidjson.dumps({"key": "Not-filter-Me"}),
-                response_body=rapidjson.dumps({"key": "Filter-Me", "key2": "Not-Filter-Me"}),
+                response_body=rapidjson.dumps(
+                    {"key": "Filter-Me", "key2": "Not-Filter-Me"}
+                ),
             ),
             req_rec_generator(
                 request_headers=[("Content-Type", "application/json")],
                 response_headers=[("Content-Type", "application/json")],
                 request_body=rapidjson.dumps({"key": "Not-filter-Me"}),
-                response_body=rapidjson.dumps({"key": JSON_BODY_FILTERED, "key2": "Not-Filter-Me"}),
+                response_body=rapidjson.dumps(
+                    {"key": JSON_BODY_FILTERED, "key2": "Not-Filter-Me"}
+                ),
             ),
         ),
         (
@@ -238,13 +297,17 @@ def test_body_type_filter(filters, req_type, in_record, out_record):
                 request_headers=[("Content-Type", "application/json")],
                 response_headers=[("Content-Type", "application/json")],
                 request_body=rapidjson.dumps({"key": {"key": "Filter-Me"}}),
-                response_body=rapidjson.dumps({"key": {"key": "Filter-Me"}, "key2": "Not-Filter-Me"}),
+                response_body=rapidjson.dumps(
+                    {"key": {"key": "Filter-Me"}, "key2": "Not-Filter-Me"}
+                ),
             ),
             req_rec_generator(
                 request_headers=[("Content-Type", "application/json")],
                 response_headers=[("Content-Type", "application/json")],
                 request_body=rapidjson.dumps({"key": {"key": JSON_BODY_FILTERED}}),
-                response_body=rapidjson.dumps({"key": {"key": JSON_BODY_FILTERED}, "key2": "Not-Filter-Me"}),
+                response_body=rapidjson.dumps(
+                    {"key": {"key": JSON_BODY_FILTERED}, "key2": "Not-Filter-Me"}
+                ),
             ),
         ),
         (
@@ -279,12 +342,7 @@ def test_body_type_filter(filters, req_type, in_record, out_record):
                 response_body=rapidjson.dumps({"key2": "Not-Filter-Me"}),
             ),
         ),
-        (
-            {"key": {"key": True}},
-            RequestType.ALL,
-            rec_generator(),
-            rec_generator(),
-        ),
+        ({"key": {"key": True}}, RequestType.ALL, rec_generator(), rec_generator()),
     ],
 )
 def test_json_body_filter(filters, req_type, in_record, out_record):

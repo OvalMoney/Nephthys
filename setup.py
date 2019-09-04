@@ -2,14 +2,17 @@ import io
 
 from setuptools import setup
 
-long_description = "See https://github.com/OvalMoney/Nephthys"
-with io.open("README.md", encoding="utf-8") as fp:
-    long_description = fp.read()
+
+def make_long_description():
+    with io.open("README.md", encoding="utf-8") as fp:
+        long_description = fp.read()
+    return long_description
+
 
 setup(
     name="Nephthys",
     description="Advanced Python Logger",
-    long_description=long_description,
+    long_description=make_long_description(),
     long_description_content_type="text/markdown",
     version="0.1.0",
     author="Fabio Todaro",
@@ -25,5 +28,5 @@ setup(
         "Operating System :: OS Independent",
     ],
     packages=["nephthys"],
-    install_requires=["click>=7" "celery>=4", "prometheus_client>=0.0.20"],
+    install_requires=[],
 )

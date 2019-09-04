@@ -11,8 +11,10 @@ from nephthys.formatters.json import JSONRenderer, JSONFormatter
 def msg():
     return {"test": "test"}
 
+
 def serializable_obj():
-    return 
+    return
+
 
 def test_renderer():
     renderer = JSONRenderer()
@@ -64,7 +66,10 @@ def test_required_parameters(msg):
     log = LogRecord("test", 20, "/app/module", 1, msg, [], None)
     out = formatter.format(log)
 
-    assert out == '{"name":"test","levelno":20,"pathname":"/app/module","lineno":1,"test":"test"}'
+    assert (
+        out
+        == '{"name":"test","levelno":20,"pathname":"/app/module","lineno":1,"test":"test"}'
+    )
 
 
 def test_exception(msg):
@@ -75,7 +80,9 @@ def test_exception(msg):
     except Exception:
         exc_info = sys.exc_info()
 
-        log = LogRecord("test", 20, "/app/module", 1, msg, [], exc_info, sinfo="Stack Informations")
+        log = LogRecord(
+            "test", 20, "/app/module", 1, msg, [], exc_info, sinfo="Stack Informations"
+        )
         out = formatter.format(log)
         out_dict = json.loads(out)
 
