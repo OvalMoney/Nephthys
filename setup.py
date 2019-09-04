@@ -28,7 +28,7 @@ setup(
         "Programming Language :: Python :: 3 :: Only",
         "Operating System :: OS Independent",
     ],
-    packages=find_packages(exclude=["tests", "requirements"])),
+    packages=find_packages(exclude=["tests", "requirements"]),
     install_requires=["webob"],
     extras_require={"JSON": ["python-rapidjson"]},
 )
