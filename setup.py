@@ -19,6 +19,7 @@ setup(
     license="MIT",
     author_email="ft@ovalmoney.com",
     url="https://github.com/OvalMoney/Nephthys",
+    python_requires=">=3.6",
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Environment :: Console",

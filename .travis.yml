@@ -28,3 +28,4 @@ jobs:
         on:
           tags: true
         skip_existing: true
+        distribution: "sdist bdist_wheel"
