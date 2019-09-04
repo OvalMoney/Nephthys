@@ -1,6 +1,6 @@
 import io
 
-from setuptools import setup, find_namespace_packages
+from setuptools import setup, find_packages
 
 
 def make_long_description():
@@ -14,7 +14,7 @@ setup(
     description="Advanced Python Logger",
     long_description=make_long_description(),
     long_description_content_type="text/markdown",
-    version="0.1.3",
+    version="0.1.4",
     author="Fabio Todaro",
     license="MIT",
     author_email="ft@ovalmoney.com",
@@ -28,7 +28,7 @@ setup(
         "Programming Language :: Python :: 3 :: Only",
         "Operating System :: OS Independent",
     ],
-    packages=find_namespace_packages(exclude=("tests",)),
+    packages=find_packages(exclude=["tests", "requirements"])),
     install_requires=["webob"],
     extras_require={"JSON": ["python-rapidjson"]},
 )
