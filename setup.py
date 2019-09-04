@@ -28,10 +28,6 @@ setup(
         "Operating System :: OS Independent",
     ],
     packages=["nephthys"],
-    install_requires=[
-        'webob'
-    ],
-    extras_require={
-        'JSON':  ["python-rapidjson"]
-    },
+    install_requires=["webob"],
+    extras_require={"JSON": ["python-rapidjson"]},
 )
