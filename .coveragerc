@@ -2,7 +2,7 @@
 source = nephthys
 
 [report]
-fail_under = 100
+fail_under = 82
 show_missing = True
 
 [paths]
