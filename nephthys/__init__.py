@@ -61,7 +61,7 @@ class FilterLoggerAdapter(BaseLoggerAdapter):
         if isinstance(msg, FilterableLog) and msg.drop:
             return
 
-        super.log(level, msg, *args, **kwargs)
+        super().log(level, msg, *args, **kwargs)
 
 
 def join_multidict(multi_dict):
