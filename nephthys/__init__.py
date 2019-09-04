@@ -6,6 +6,8 @@ from urllib.parse import urlparse
 
 class BaseLoggerAdapter(LoggerAdapter):
     def __init__(self, logger, extra_tags=None, *args, **kwargs):
+        super().__init__(logger=logger, *args, **kwargs)
+
         self._extra_tags = extra_tags or []
         self._extra_tags.append(logger.name)
 
