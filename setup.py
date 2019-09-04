@@ -10,7 +10,7 @@ def make_long_description():
 
 
 setup(
-    name="Nephthys",
+    name="nephthys",
     description="Advanced Python Logger",
     long_description=make_long_description(),
     long_description_content_type="text/markdown",
@@ -28,5 +28,10 @@ setup(
         "Operating System :: OS Independent",
     ],
     packages=["nephthys"],
-    install_requires=[],
+    install_requires=[
+        'webob'
+    ],
+    extras_require={
+        'JSON':  ["python-rapidjson"]
+    },
 )
