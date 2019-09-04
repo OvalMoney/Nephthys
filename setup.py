@@ -1,6 +1,6 @@
 import io
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 def make_long_description():
@@ -14,7 +14,7 @@ setup(
     description="Advanced Python Logger",
     long_description=make_long_description(),
     long_description_content_type="text/markdown",
-    version="0.1.0",
+    version="0.1.1",
     author="Fabio Todaro",
     license="MIT",
     author_email="ft@ovalmoney.com",
@@ -27,7 +27,7 @@ setup(
         "Programming Language :: Python :: 3 :: Only",
         "Operating System :: OS Independent",
     ],
-    packages=["nephthys"],
+    packages=find_packages(exclude=("tests",)),
     install_requires=["webob"],
     extras_require={"JSON": ["python-rapidjson"]},
 )

@@ -1,6 +1,6 @@
 include README.md
 include setup.py
-include tox.ini
+include setup.cfg
 include LICENSE
 graft tests
 
