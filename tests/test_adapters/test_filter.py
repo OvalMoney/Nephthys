@@ -17,7 +17,7 @@ def log_generator(message=None, extra_tags=None):
 def filt_log_generator(record_filter=None, message=None, extra_tags=None):
     filt_log = FilterableLog(LogRecord(message=message, extra_tags=extra_tags))
     if record_filter:
-        filt_log.add_filter(record_filter)
+        filt_log.add_filters([record_filter])
     return filt_log
 
 

@@ -17,7 +17,7 @@ class BaseLoggerAdapter(LoggerAdapter):
 
         if isinstance(msg, Log):
             log_rec = msg.log_record
-            log_rec.add_tag(self._extra_tags)
+            log_rec.add_tags(self._extra_tags)
 
         return msg
 
@@ -98,8 +98,11 @@ class FilterableLog(Log):
     def filters(self):
         return self._filters
 
-    def add_filter(self, record_filter):
-        self._filters.append(record_filter)
+    def add_filters(self, record_filters):
+        if isinstance(record_filters, list):
+            self._filters.extend(record_filters)
+        else:
+            self._filters.append(record_filters)
 
 
 class LogRecord:
@@ -112,11 +115,11 @@ class LogRecord:
 
         return msg_dict
 
-    def add_tag(self, tag):
-        if isinstance(tag, list):
-            self._extra_tags.extend(tag)
+    def add_tags(self, tags):
+        if isinstance(tags, list):
+            self._extra_tags.extend(tags)
         else:
-            self._extra_tags.append(tag)
+            self._extra_tags.append(tags)
 
 
 class RequestLogRecord(LogRecord):
