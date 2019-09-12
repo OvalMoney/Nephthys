@@ -72,11 +72,11 @@ def join_multidict(multi_dict):
 
 
 def add_to_multidict(multi_dict, name, value):
-    if isinstance(value, str):
-        multi_dict.add(name, value)
-    elif isinstance(value, list):
+    if isinstance(value, list):
         for val in value:
             multi_dict.add(name, val)
+    else:
+        multi_dict.add(name, value)
 
 
 class Log:
