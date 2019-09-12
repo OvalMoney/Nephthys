@@ -15,8 +15,9 @@ HEADER_FILTERED = "<filtered>"
 
 def filter_headers(filters, headers):
     for hf in filters:
-        if hf.title() in headers:
-            headers[hf] = HEADER_FILTERED
+        hft = hf.title()
+        if hft in headers:
+            headers[hft] = HEADER_FILTERED
 
 
 class HeaderFilter:
