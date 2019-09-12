@@ -62,7 +62,7 @@ def filter_json_body(s, r):
 
 class BodyTypeFilter:
     def __init__(self, allowed_types=None, req_type=RequestType.ALL):
-        self._allowed_types = allowed_types or LOGGABLE_TYPES
+        self._allowed_types = LOGGABLE_TYPES if allowed_types is None else allowed_types
         self._req_type = req_type
 
     def filter(self, log_record):
