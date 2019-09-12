@@ -35,7 +35,7 @@ def req_rec_generator(
     "filters,req_type,in_record,out_record",
     [
         (
-            ["X-Filter-Me"],
+            ["X-Filter-me"],
             RequestType.REQUEST,
             req_rec_generator(
                 request_headers=[
