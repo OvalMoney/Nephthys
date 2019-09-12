@@ -20,8 +20,8 @@ def filter_headers(filters, headers):
 
 
 class HeaderFilter:
-    def __init__(self, headers, req_type=RequestType.ALL):
-        self._headers = headers
+    def __init__(self, headers=None, req_type=RequestType.ALL):
+        self._headers = headers or []
         self._req_type = req_type
 
     def filter(self, log_record):
@@ -88,7 +88,7 @@ class BodyTypeFilter:
 
 class JsonBodyFilter:
     def __init__(self, body_schema, req_type=RequestType.ALL):
-        self._body_schema = body_schema
+        self._body_schema = body_schema or {}
         self._req_type = req_type
 
     def filter(self, log_record):
