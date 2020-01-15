@@ -4,52 +4,11 @@ from enum import Enum
 from .. import RequestLogRecord
 
 
-class RequestType(Enum):
-    ALL = 1
-    REQUEST = 2
-    RESPONSE = 3
-
-
+QS_FILTERED = "<filtered>"
 HEADER_FILTERED = "<filtered>"
-
-
-def filter_headers(filters, headers):
-    for hf in filters:
-        hft = hf.title()
-        if hft in headers:
-            headers[hft] = HEADER_FILTERED
-
-
-class HeaderFilter:
-    def __init__(self, headers=None, req_type=RequestType.ALL):
-        self._headers = headers or []
-        self._req_type = req_type
-
-    def filter(self, log_record):
-        if not isinstance(log_record, RequestLogRecord):
-            return
-
-        if self._req_type == RequestType.REQUEST or self._req_type == RequestType.ALL:
-            filter_headers(self._headers, log_record._req_headers)
-
-        if self._req_type == RequestType.RESPONSE or self._req_type == RequestType.ALL:
-            filter_headers(self._headers, log_record._res_headers)
-
-
 LOGGABLE_TYPES = ["application/json", "text/plain", "text/html"]
 BODY_NOT_LOGGABLE = "<body not loggable Content-Type {}>"
 JSON_BODY_FILTERED = "<filtered>"
-
-
-def filter_body(body, content_type, allowed_types):
-    if content_type and any(valid_type in content_type for valid_type in allowed_types):
-        return body
-
-    return BODY_NOT_LOGGABLE.format(content_type)
-
-
-def find_content_type(headers):
-    return ",".join(headers.getall("Content-Type"))
 
 
 def filter_json_body(s, r):
@@ -61,10 +20,64 @@ def filter_json_body(s, r):
                 r[k] = JSON_BODY_FILTERED
 
 
+def find_content_type(headers):
+    return ",".join(headers.getall("Content-Type"))
+
+
+class RequestType(Enum):
+    ALL = 1
+    REQUEST = 2
+    RESPONSE = 3
+
+
+class HeaderFilter:
+    def __init__(self, headers=None, req_type=RequestType.ALL):
+        self._headers = headers or []
+        self._req_type = req_type
+
+    def _filter_headers(self, headers):
+        for hf in self._headers:
+            hft = hf.title()
+            if hft in headers:
+                headers[hft] = HEADER_FILTERED
+
+    def filter(self, log_record):
+        if not isinstance(log_record, RequestLogRecord):
+            return
+
+        if self._req_type == RequestType.REQUEST or self._req_type == RequestType.ALL:
+            self._filter_headers(log_record._req_headers)
+
+        if self._req_type == RequestType.RESPONSE or self._req_type == RequestType.ALL:
+            self._filter_headers(log_record._res_headers)
+
+
+class QueryStringFilter:
+    def __init__(self, keys=None):
+        self._keys = keys or []
+
+    def _filter_keys(self, keys):
+        for kf in self._keys:
+            if kf in keys:
+                keys[kf] = QS_FILTERED
+
+    def filter(self, log_record):
+        if not isinstance(log_record, RequestLogRecord):
+            return
+
+        self._filter_keys(log_record._req_query)
+
+
 class BodyTypeFilter:
     def __init__(self, allowed_types=None, req_type=RequestType.ALL):
         self._allowed_types = LOGGABLE_TYPES if allowed_types is None else allowed_types
         self._req_type = req_type
+
+    def _filter_body(self, body, content_type):
+        if content_type and any(valid_type in content_type for valid_type in self._allowed_types):
+            return body
+
+        return BODY_NOT_LOGGABLE.format(content_type)
 
     def filter(self, log_record):
         if not isinstance(log_record, RequestLogRecord):
@@ -74,16 +87,16 @@ class BodyTypeFilter:
             self._req_type == RequestType.REQUEST or self._req_type == RequestType.ALL
         ):
             content_type = find_content_type(log_record._req_headers)
-            log_record._req_body = filter_body(
-                log_record._req_body, content_type, self._allowed_types
+            log_record._req_body = self._filter_body(
+                log_record._req_body, content_type
             )
 
         if log_record._res_body and (
             self._req_type == RequestType.RESPONSE or self._req_type == RequestType.ALL
         ):
             content_type = find_content_type(log_record._res_headers)
-            log_record._res_body = filter_body(
-                log_record._res_body, content_type, self._allowed_types
+            log_record._res_body = self._filter_body(
+                log_record._res_body, content_type
             )
 
 

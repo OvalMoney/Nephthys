@@ -2,9 +2,10 @@ import rapidjson
 import pytest
 
 from nephthys import RequestLogRecord, LogRecord
-from nephthys.filters.requests import HeaderFilter, BodyTypeFilter, JsonBodyFilter
+from nephthys.filters.requests import HeaderFilter, BodyTypeFilter, JsonBodyFilter, QueryStringFilter
 from nephthys.filters.requests import (
     RequestType,
+    QS_FILTERED,
     HEADER_FILTERED,
     BODY_NOT_LOGGABLE,
     JSON_BODY_FILTERED,
@@ -16,7 +17,7 @@ def rec_generator():
 
 
 def req_rec_generator(
-    request_headers=None, response_headers=None, request_body=None, response_body=None
+    request_headers=None, response_headers=None, request_body=None, response_body=None, qs=None
 ):
     req_rec = RequestLogRecord()
 
@@ -25,10 +26,65 @@ def req_rec_generator(
     for name, value in response_headers or []:
         req_rec.add_response_header(name, value)
 
+    for name, value in qs or []:
+        req_rec.add_request_querystring(name, value)
+
     req_rec.request_body = request_body
     req_rec.response_body = response_body
 
     return req_rec
+
+
+@pytest.mark.parametrize(
+    "filters,in_record,out_record",
+    [
+        (
+            ["QSFiltered", "QSfiltered2"],
+            req_rec_generator(
+                qs=[
+                    ("QSFiltered", "value1"),
+                    ("QSfiltered", "value2"),
+                    ("QSNotFiltered", "value3"),
+                    ("QSfiltered2", "value4"),
+                ],
+            ),
+            req_rec_generator(
+                qs=[
+                    ("QSFiltered", QS_FILTERED),
+                    ("QSfiltered", "value2"),
+                    ("QSNotFiltered", "value3"),
+                    ("QSfiltered2", QS_FILTERED),
+                ],
+            ),
+        ),
+        (
+            [],
+            req_rec_generator(
+                qs=[
+                    ("QSFiltered", "value1"),
+                    ("QSfiltered", "value2"),
+                    ("QSNotFiltered", "value3"),
+                    ("QSfiltered2", "value4"),
+                ],
+            ),
+            req_rec_generator(
+                qs=[
+                    ("QSFiltered", "value1"),
+                    ("QSfiltered", "value2"),
+                    ("QSNotFiltered", "value3"),
+                    ("QSfiltered2", "value4"),
+                ],
+            ),
+        ),
+        (["QSFiltered"], rec_generator(), rec_generator()),
+    ],
+)
+def test_qs_filter(filters, in_record, out_record):
+    qs_filter = QueryStringFilter(filters)
+
+    qs_filter.filter(in_record)
+
+    assert in_record.asdict() == out_record.asdict()
 
 
 @pytest.mark.parametrize(
