@@ -1,10 +1,12 @@
 import re
+
+from .filter import IFilter
 from .. import LogRecord
 
 FILTER_STRING = "<filtered>"
 
 
-class MessageBlacklist:
+class MessageBlacklist(IFilter):
     def __init__(self, blacklist=None):
         self._blacklist = blacklist or []
         self._blacklist_string = "|".join(self._blacklist)
