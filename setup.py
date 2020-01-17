@@ -30,5 +30,5 @@ setup(
     ],
     packages=find_packages(exclude=["tests", "requirements"]),
     install_requires=["webob"],
-    extras_require={"JSON": ["python-rapidjson"]},
+    extras_require={"JSON": ["python-rapidjson"], "requests": ["requests"]},
 )
