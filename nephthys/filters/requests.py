@@ -1,6 +1,7 @@
 import rapidjson
 from enum import Enum
 
+from .filter import IFilter
 from .. import RequestLogRecord
 
 
@@ -30,7 +31,7 @@ class RequestType(Enum):
     RESPONSE = 3
 
 
-class HeaderFilter:
+class HeaderFilter(IFilter):
     def __init__(self, headers=None, req_type=RequestType.ALL):
         self._headers = headers or []
         self._req_type = req_type
@@ -52,7 +53,7 @@ class HeaderFilter:
             self._filter_headers(log_record._res_headers)
 
 
-class QueryStringFilter:
+class QueryStringFilter(IFilter):
     def __init__(self, keys=None):
         self._keys = keys or []
 
@@ -68,7 +69,7 @@ class QueryStringFilter:
         self._filter_keys(log_record._req_query)
 
 
-class BodyTypeFilter:
+class BodyTypeFilter(IFilter):
     def __init__(self, allowed_types=None, req_type=RequestType.ALL):
         self._allowed_types = LOGGABLE_TYPES if allowed_types is None else allowed_types
         self._req_type = req_type
@@ -100,7 +101,7 @@ class BodyTypeFilter:
             )
 
 
-class JsonBodyFilter:
+class JsonBodyFilter(IFilter):
     def __init__(self, body_schema, req_type=RequestType.ALL):
         self._body_schema = body_schema or {}
         self._req_type = req_type
