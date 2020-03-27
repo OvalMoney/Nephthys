@@ -8,11 +8,11 @@ from unittest.mock import MagicMock, call
 import pytest
 import requests
 
-from nephthys.clients.requests_session import (
+from nephthys.clients.requests import (
     catch_logger_exception,
     decorate_log_request,
     decorate_log_response,
-    NephthysSession)
+    Session)
 from nephthys.filters.requests import BODY_NOT_LOGGABLE
 
 
@@ -127,7 +127,7 @@ def test_send_log_record(caplog, m):
     caplog.set_level(logging.INFO)
     m.get("https://ovalmoney.com/user", status_code=200)
 
-    s = NephthysSession()
+    s = Session()
     s._logger.info = MagicMock()
     s.get("https://ovalmoney.com/user")
 
@@ -138,7 +138,7 @@ def test_send_log_record_exception(caplog, m):
     caplog.set_level(logging.INFO)
     m.get("https://ovalmoney.com/user", exc=requests.exceptions.ConnectTimeout)
 
-    s = NephthysSession()
+    s = Session()
     s._logger.exception = MagicMock()
     with pytest.raises(requests.exceptions.ConnectTimeout):
         s.get("https://ovalmoney.com/user")
@@ -154,7 +154,7 @@ def test_raw_data_reponse_log(caplog, m):
         content=b"\xFF\x8F",
     )
 
-    s = NephthysSession()
+    s = Session()
     s.get("https://ovalmoney.com/raw_data")
 
     log_rec = [rec for rec in caplog.records][0]
@@ -168,7 +168,7 @@ def test_raw_data_request_log(caplog, m):
     caplog.set_level(logging.INFO)
     m.post("https://ovalmoney.com/raw_data")
 
-    s = NephthysSession()
+    s = Session()
     s.post("https://ovalmoney.com/raw_data", headers={"Content-Type": "video"}, data=b"\xFF\x8F")
 
     log_rec = [rec for rec in caplog.records][0]
@@ -181,7 +181,7 @@ def test_raw_data_request_log(caplog, m):
 def test_session_fail_http(m):
     m.get("https://ovalmoney.com/user", exc=requests.exceptions.ConnectTimeout)
 
-    s = NephthysSession()
+    s = Session()
     with pytest.raises(requests.exceptions.ConnectTimeout):
         s.get("https://ovalmoney.com/user")
 
@@ -190,7 +190,7 @@ def test_session_fail_http_log(caplog, m):
     caplog.set_level(logging.INFO)
     m.get("https://ovalmoney.com/user", exc=requests.exceptions.ConnectTimeout)
 
-    s = NephthysSession()
+    s = Session()
     with pytest.raises(requests.exceptions.ConnectTimeout):
         s.get("https://ovalmoney.com/user")
 
@@ -213,7 +213,7 @@ def test_session_success(caplog, m):
         status_code=200,
     )
 
-    s = NephthysSession()
+    s = Session()
     response = s.get("https://ovalmoney.com/user", params={"key1": "value1", "key2": ["value2", "value3"]})
 
     assert response.headers
@@ -231,7 +231,7 @@ def test_session_success_log(caplog, m):
     )
 
     with freeze_time(datetime.utcnow()):
-        s = NephthysSession(log_tag="test")
+        s = Session(log_tag="test")
         s.get("https://ovalmoney.com/user", params={"key1": "value1", "key2": ["value2", "value3"]})
         now = datetime.utcnow().timestamp()
 

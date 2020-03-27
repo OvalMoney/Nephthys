@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 from urllib.parse import parse_qs, urlparse
-from requests.sessions import Session
+from requests.sessions import Session as RequestsSession
 
 from nephthys import FilterLoggerAdapter, RequestLogRecord, Log
 from nephthys.filters.requests import BodyTypeFilter
@@ -78,7 +78,7 @@ class NephthysMixin:
 
     _logger = None
 
-    def init_nephthys_logger(self, log_tag, log_filters):
+    def __init__(self, log_tag=None, log_filters=None, *args, **kwargs):
         """
         :param log_tag: The tag that will identify logs from this Session
         :type log_tag: string
@@ -93,6 +93,7 @@ class NephthysMixin:
         self._logger = FilterLoggerAdapter(
             logger=logger, filters=_log_filters, extra_tags=[log_tag]
         )
+        super().__init__(*args, **kwargs)
 
     @catch_logger_exception
     def _send_log_record(
@@ -121,28 +122,6 @@ class NephthysMixin:
         else:
             self._logger.info(Log(log_rec))
 
-
-class NephthysSession(Session, NephthysMixin):
-    """
-    Provides a requests.session.Session overriding .send() method so that it logs
-    each request with an instance of nephthys.FilterLoggerAdapter.
-
-    This class can be used as a concrete implementation of requests.session.Session
-    in an existing project.
-    If said project already uses a custom implementation of Session, this class can
-    be used as an example of how to add NephthysMixin to it.
-    """
-
-    def __init__(self, log_tag=None, log_filters=None):
-        """
-        :param log_tag: The tag that will identify logs from this Session
-        :type log_tag: string
-        :param log_filters: List of additional IRequestFilter
-        :type log_filters: list
-        """
-        super().__init__()
-        self.init_nephthys_logger(log_tag, log_filters)
-
     def send(self, request, **kwargs):
         start_time = datetime.utcnow().timestamp()
 
@@ -165,3 +144,10 @@ class NephthysSession(Session, NephthysMixin):
         )
 
         return response
+
+
+class Session(NephthysMixin, RequestsSession):
+    """
+    Provides a requests.session.Session with Nephthys Logging.
+    """
+    pass
