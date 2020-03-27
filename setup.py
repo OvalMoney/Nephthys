@@ -14,7 +14,7 @@ setup(
     description="Advanced Python Logger",
     long_description=make_long_description(),
     long_description_content_type="text/markdown",
-    version="0.3.0",
+    version="0.4.0",
     author="Fabio Todaro",
     license="MIT",
     author_email="ft@ovalmoney.com",
