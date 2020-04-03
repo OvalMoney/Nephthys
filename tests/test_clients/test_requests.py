@@ -39,7 +39,7 @@ def test_exception_catcher_decorator(caplog):
 
 def test_decorate_log_request_headers():
     log_record = MagicMock()
-    test_headers = {"test": "ciao", "bla": "hi"}
+    test_headers = {"key1": "value1", "key2": "value2"}
     request = MagicMock(url="https://ovalmoney.com", headers=test_headers)
     decorate_log_request(log_record, request)
     for name, value in test_headers.items():
@@ -61,10 +61,10 @@ def test_decorate_log_request_body():
     log_record = MagicMock()
     request = MagicMock(url=f"https://ovalmoney.com")
     body = MagicMock()
-    body.decode.return_value = "ciao"
+    body.decode.return_value = "return"
     request.body = body
     decorate_log_request(log_record, request)
-    assert log_record.request_body == "ciao"
+    assert log_record.request_body == "return"
     body.decode.assert_called_with("UTF-8", errors="strict")
 
 
@@ -80,7 +80,7 @@ def test_decorate_log_request_body_raises():
 
 def test_decorate_log_response_headers():
     log_record = MagicMock()
-    test_headers = {"test": "ciao", "bla": "hi"}
+    test_headers = {"key1": "value1", "key2": "value2"}
     response = MagicMock(url="https://ovalmoney.com", headers=test_headers)
     decorate_log_response(log_record, response)
     for name, value in test_headers.items():
@@ -89,7 +89,7 @@ def test_decorate_log_response_headers():
 
 
 @pytest.mark.parametrize(
-    "encoding,expected_encoding", [(None, "utf-8"), ("UtF-8", "utf-8-sig")]
+    "encoding,expected_encoding", [(None, "utf-8"), ("utf-8", "utf-8")]
 )
 def test_decorate_log_response_content(encoding, expected_encoding):
     log_record = MagicMock()
@@ -108,7 +108,7 @@ def test_decorate_log_response_content(encoding, expected_encoding):
     [
         (TypeError, None, "utf-8"),
         (UnicodeDecodeError, None, "utf-8"),
-        (LookupError, "UtF-8", "utf-8-sig"),
+        (LookupError, "UtF8", "UtF8"),
     ],
 )
 def test_decorate_log_response_content_raises(exception, encoding, expected_encoding):
@@ -146,7 +146,7 @@ def test_send_log_record_exception(caplog, m):
     assert s._logger.exception.called
 
 
-def test_raw_data_reponse_log(caplog, m):
+def test_raw_data_reponse_body_log(caplog, m):
     caplog.set_level(logging.INFO)
     m.get(
         "https://ovalmoney.com/raw_data",
@@ -164,7 +164,7 @@ def test_raw_data_reponse_log(caplog, m):
     )
 
 
-def test_raw_data_request_log(caplog, m):
+def test_raw_data_request_body_log(caplog, m):
     caplog.set_level(logging.INFO)
     m.post("https://ovalmoney.com/raw_data")
 
@@ -176,6 +176,34 @@ def test_raw_data_request_log(caplog, m):
     assert log_rec.msg["request"]["body"] == BODY_NOT_LOGGABLE.format(
         log_rec.msg["request"]["header"]["Content-Type"]
     )
+
+
+def test_text_reponse_body_log(caplog, m):
+    caplog.set_level(logging.INFO)
+    m.get(
+        "https://ovalmoney.com/text_data",
+        headers={"Content-Type": "text/plain"},
+        text="Response",
+    )
+
+    s = Session()
+    s.get("https://ovalmoney.com/text_data")
+
+    log_rec = [rec for rec in caplog.records][0]
+
+    assert log_rec.msg["response"]["body"] == "Response"
+
+
+def test_form_data_request_body_log(caplog, m):
+    caplog.set_level(logging.INFO)
+    m.post("https://ovalmoney.com/form_data")
+
+    s = Session()
+    s.post("https://ovalmoney.com/form_data", data={"key": "value", "key2": "value2"})
+
+    log_rec = [rec for rec in caplog.records][0]
+
+    assert log_rec.msg["request"]["body"] == "key=value&key2=value2"
 
 
 def test_session_fail_http(m):

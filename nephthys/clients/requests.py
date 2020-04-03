@@ -40,7 +40,10 @@ def decorate_log_request(log_record, request):
             log_record.add_request_querystring(name, value)
     if request.body:
         try:
-            log_record.request_body = request.body.decode("UTF-8", errors="strict")
+            if isinstance(request.body, str):
+                log_record.request_body = request.body
+            else:
+                log_record.request_body = request.body.decode("UTF-8", errors="strict")
         except UnicodeDecodeError:
             log_record.request_body = "<RAW Data>"
 
@@ -53,12 +56,7 @@ def decorate_log_response(log_record, response):
             log_record.add_response_header(name, value)
 
     if response.content:
-        encoding = response.encoding
-        if encoding is None:
-            encoding = "utf-8"
-        # Forcefully remove BOM from UTF-8
-        elif encoding.lower() == "utf-8":
-            encoding = "utf-8-sig"
+        encoding = response.encoding or "utf-8"
 
         try:
             log_record.response_body = response.content.decode(
