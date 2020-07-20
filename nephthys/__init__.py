@@ -136,6 +136,7 @@ class RequestLogRecord(LogRecord):
         self._route = None
         self._status_code = None
         self._user = None
+        self._user_uuid = None
         self._req_query = MultiDict()
         self._req_headers = MultiDict()
         self._req_body = None
@@ -166,6 +167,7 @@ class RequestLogRecord(LogRecord):
                 "route": self._route,
                 "route_match": self._route_match,
                 "user": self._user,
+                "user_uuid": self._user_uuid,
                 "body": self._req_body,
             },
             "response": {
@@ -232,6 +234,9 @@ class RequestLogRecord(LogRecord):
     def _set_user(self, value):
         self._user = value
 
+    def _set_user_uuid(self, value):
+        self._user_uuid = value
+
     request_start = property(None, _set_request_start)
     request_end = property(None, _set_request_end)
     request_body = property(None, _set_request_body)
@@ -241,3 +246,4 @@ class RequestLogRecord(LogRecord):
     route = property(None, _set_route)
     status_code = property(None, _set_status_code)
     user = property(None, _set_user)
+    user_uuid = property(None, _set_user_uuid)
