@@ -148,12 +148,6 @@ class RequestLogRecord(LogRecord):
         base_dict = super().asdict()
 
         req_dict = {
-            "request_start": self._req_start,  # Deprecated
-            "request_end": self._req_end,  # Deprecated
-            "request_time": self._req_time,  # Deprecated
-            "route": self._route,  # Deprecated
-            "status_code": self._status_code,  # Deprecated
-            "user": self._user,  # Deprecated
             "request": {
                 "start": self._req_start,
                 "end": self._req_end,
