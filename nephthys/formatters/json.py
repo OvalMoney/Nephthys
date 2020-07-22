@@ -62,6 +62,7 @@ class JSONFormatter(logging.Formatter):
             # user-supplied dict.
             if record.exc_info and not message_dict.get("exc_info"):
                 message_dict["exc_info"] = self.formatException(record.exc_info)
+                message_dict["exc"] = record.exc_info[0].__name__
             if not message_dict.get("exc_info") and record.exc_text:
                 message_dict["exc_info"] = record.exc_text
             # Display formatted record of stack frames
