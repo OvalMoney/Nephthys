@@ -87,5 +87,6 @@ def test_exception(msg):
         out_dict = json.loads(out)
 
         assert out_dict["exc_info"] == formatter.formatException(exc_info)
+        assert out_dict["exc"] == "Exception"
         assert out_dict["stack_info"] == "Stack Informations"
         assert out_dict["test"] == "test"
