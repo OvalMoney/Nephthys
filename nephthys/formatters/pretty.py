@@ -1,5 +1,6 @@
-import logging
 import copy
+import logging
+
 from .json import JSONRenderer
 
 

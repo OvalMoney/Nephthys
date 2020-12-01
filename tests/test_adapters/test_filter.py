@@ -1,8 +1,9 @@
 import logging
+
 import pytest
 
+from nephthys import FilterableLog, FilterLoggerAdapter, Log, LogRecord
 from nephthys.filters.message import MessageBlacklist
-from nephthys import FilterLoggerAdapter, FilterableLog, Log, LogRecord
 
 
 @pytest.fixture

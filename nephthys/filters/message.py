@@ -1,7 +1,7 @@
 import re
 
-from .filter import IFilter
 from .. import LogRecord
+from .filter import IFilter
 
 FILTER_STRING = "<filtered>"
 

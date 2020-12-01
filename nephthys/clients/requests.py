@@ -1,9 +1,10 @@
 import logging
 from datetime import datetime
 from urllib.parse import parse_qs, urlparse
+
 from requests.sessions import Session as RequestsSession
 
-from nephthys import FilterLoggerAdapter, RequestLogRecord, Log
+from nephthys import FilterLoggerAdapter, Log, RequestLogRecord
 from nephthys.filters.requests import BodyTypeFilter
 
 logger = logging.getLogger("requests_out")

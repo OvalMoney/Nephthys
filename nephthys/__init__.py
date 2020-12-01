@@ -1,7 +1,8 @@
 import itertools
 from logging import LoggerAdapter
-from webob.multidict import MultiDict
 from urllib.parse import urlparse
+
+from webob.multidict import MultiDict
 
 
 class BaseLoggerAdapter(LoggerAdapter):
