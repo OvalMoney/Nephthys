@@ -1,9 +1,9 @@
-import rapidjson
 from enum import Enum
 
-from .filter import IFilter
-from .. import RequestLogRecord
+import rapidjson
 
+from .. import RequestLogRecord
+from .filter import IFilter
 
 QS_FILTERED = "<filtered>"
 HEADER_FILTERED = "<filtered>"
@@ -75,7 +75,9 @@ class BodyTypeFilter(IFilter):
         self._req_type = req_type
 
     def _filter_body(self, body, content_type):
-        if content_type and any(valid_type in content_type for valid_type in self._allowed_types):
+        if content_type and any(
+            valid_type in content_type for valid_type in self._allowed_types
+        ):
             return body
 
         return BODY_NOT_LOGGABLE.format(content_type)
@@ -88,17 +90,13 @@ class BodyTypeFilter(IFilter):
             self._req_type == RequestType.REQUEST or self._req_type == RequestType.ALL
         ):
             content_type = find_content_type(log_record._req_headers)
-            log_record._req_body = self._filter_body(
-                log_record._req_body, content_type
-            )
+            log_record._req_body = self._filter_body(log_record._req_body, content_type)
 
         if log_record._res_body and (
             self._req_type == RequestType.RESPONSE or self._req_type == RequestType.ALL
         ):
             content_type = find_content_type(log_record._res_headers)
-            log_record._res_body = self._filter_body(
-                log_record._res_body, content_type
-            )
+            log_record._res_body = self._filter_body(log_record._res_body, content_type)
 
 
 class JsonBodyFilter(IFilter):

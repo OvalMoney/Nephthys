@@ -1,6 +1,7 @@
 import logging
-import rapidjson
 import re
+
+import rapidjson
 
 
 class JSONRenderer:

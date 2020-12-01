@@ -1,18 +1,17 @@
 import logging
 from datetime import datetime
-
-import requests_mock
-from freezegun import freeze_time
 from unittest.mock import MagicMock, call
 
 import pytest
 import requests
+import requests_mock
+from freezegun import freeze_time
 
 from nephthys.clients.requests import (
+    Session,
     catch_logger_exception,
     decorate_log_request,
     decorate_log_response,
-    Session,
 )
 from nephthys.filters.requests import BODY_NOT_LOGGABLE
 

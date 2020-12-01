@@ -4,7 +4,7 @@ from logging import LogRecord
 
 import pytest
 
-from nephthys.formatters.json import JSONRenderer, JSONFormatter
+from nephthys.formatters.json import JSONFormatter, JSONRenderer
 
 
 @pytest.fixture

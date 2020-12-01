@@ -1,14 +1,17 @@
-import rapidjson
 import pytest
+import rapidjson
 
-from nephthys import RequestLogRecord, LogRecord
-from nephthys.filters.requests import HeaderFilter, BodyTypeFilter, JsonBodyFilter, QueryStringFilter
+from nephthys import LogRecord, RequestLogRecord
 from nephthys.filters.requests import (
-    RequestType,
-    QS_FILTERED,
-    HEADER_FILTERED,
     BODY_NOT_LOGGABLE,
+    HEADER_FILTERED,
     JSON_BODY_FILTERED,
+    QS_FILTERED,
+    BodyTypeFilter,
+    HeaderFilter,
+    JsonBodyFilter,
+    QueryStringFilter,
+    RequestType,
 )
 
 
@@ -17,7 +20,11 @@ def rec_generator():
 
 
 def req_rec_generator(
-    request_headers=None, response_headers=None, request_body=None, response_body=None, qs=None
+    request_headers=None,
+    response_headers=None,
+    request_body=None,
+    response_body=None,
+    qs=None,
 ):
     req_rec = RequestLogRecord()
 
@@ -46,7 +53,7 @@ def req_rec_generator(
                     ("QSfiltered", "value2"),
                     ("QSNotFiltered", "value3"),
                     ("QSfiltered2", "value4"),
-                ],
+                ]
             ),
             req_rec_generator(
                 qs=[
@@ -54,7 +61,7 @@ def req_rec_generator(
                     ("QSfiltered", "value2"),
                     ("QSNotFiltered", "value3"),
                     ("QSfiltered2", QS_FILTERED),
-                ],
+                ]
             ),
         ),
         (
@@ -65,7 +72,7 @@ def req_rec_generator(
                     ("QSfiltered", "value2"),
                     ("QSNotFiltered", "value3"),
                     ("QSfiltered2", "value4"),
-                ],
+                ]
             ),
             req_rec_generator(
                 qs=[
@@ -73,7 +80,7 @@ def req_rec_generator(
                     ("QSfiltered", "value2"),
                     ("QSNotFiltered", "value3"),
                     ("QSfiltered2", "value4"),
-                ],
+                ]
             ),
         ),
         (["QSFiltered"], rec_generator(), rec_generator()),
