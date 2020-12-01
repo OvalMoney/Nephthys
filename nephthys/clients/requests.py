@@ -1,9 +1,10 @@
 import logging
 from datetime import datetime
 from urllib.parse import parse_qs, urlparse
+
 from requests.sessions import Session as RequestsSession
 
-from nephthys import FilterLoggerAdapter, RequestLogRecord, Log
+from nephthys import FilterLoggerAdapter, Log, RequestLogRecord
 from nephthys.filters.requests import BodyTypeFilter
 
 logger = logging.getLogger("requests_out")
@@ -123,6 +124,10 @@ class NephthysMixin:
     def send(self, request, **kwargs):
         start_time = datetime.utcnow().timestamp()
 
+        if "X-Route-Header" in request.headers:
+            route = request.headers.pop("X-Route-Header")
+            request.route = route
+
         try:
             response = super().send(request, **kwargs)
         except Exception as exc:
@@ -143,9 +148,22 @@ class NephthysMixin:
 
         return response
 
+    def request(self, method, url, **kwargs):
+
+        if "route" in kwargs:
+            route = kwargs.pop("route")
+
+            if "headers" in kwargs:
+                kwargs["headers"]["X-Route-Header"] = route
+            else:
+                kwargs["headers"] = {"X-Route-Header": route}
+
+        return super().request(method, url, **kwargs)
+
 
 class Session(NephthysMixin, RequestsSession):
     """
     Provides a requests.session.Session with Nephthys Logging.
     """
+
     pass

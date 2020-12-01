@@ -12,7 +12,8 @@ from nephthys.clients.requests import (
     catch_logger_exception,
     decorate_log_request,
     decorate_log_response,
-    Session)
+    Session,
+)
 from nephthys.filters.requests import BODY_NOT_LOGGABLE
 
 
@@ -169,7 +170,11 @@ def test_raw_data_request_body_log(caplog, m):
     m.post("https://ovalmoney.com/raw_data")
 
     s = Session()
-    s.post("https://ovalmoney.com/raw_data", headers={"Content-Type": "video"}, data=b"\xFF\x8F")
+    s.post(
+        "https://ovalmoney.com/raw_data",
+        headers={"Content-Type": "video"},
+        data=b"\xFF\x8F",
+    )
 
     log_rec = [rec for rec in caplog.records][0]
 
@@ -242,7 +247,10 @@ def test_session_success(caplog, m):
     )
 
     s = Session()
-    response = s.get("https://ovalmoney.com/user", params={"key1": "value1", "key2": ["value2", "value3"]})
+    response = s.get(
+        "https://ovalmoney.com/user",
+        params={"key1": "value1", "key2": ["value2", "value3"]},
+    )
 
     assert response.headers
     assert response.status_code == 200
@@ -260,7 +268,10 @@ def test_session_success_log(caplog, m):
 
     with freeze_time(datetime.utcnow()):
         s = Session(log_tag="test")
-        s.get("https://ovalmoney.com/user", params={"key1": "value1", "key2": ["value2", "value3"]})
+        s.get(
+            "https://ovalmoney.com/user",
+            params={"key1": "value1", "key2": ["value2", "value3"]},
+        )
         now = datetime.utcnow().timestamp()
 
     log = [rec.msg for rec in caplog.records][0]
@@ -273,8 +284,8 @@ def test_session_success_log(caplog, m):
 
     assert log["request"]["method"] == "GET"
     assert (
-            log["request"]["url"]
-            == "https://ovalmoney.com/user?key1=value1&key2=value2&key2=value3"
+        log["request"]["url"]
+        == "https://ovalmoney.com/user?key1=value1&key2=value2&key2=value3"
     )
     assert log["request"]["path"] == "/user"
     assert log["request"]["host"] == "ovalmoney.com"
@@ -282,3 +293,73 @@ def test_session_success_log(caplog, m):
 
     assert log["response"]["body"] == '{"test": true}'
     assert log["response"]["status_code"] == 200
+
+
+def test_no_route(m):
+    """
+    Check whether a request without the `route` attribute works correctly
+    """
+    test_path = "https://ovalmoney.com/user"
+    m.get(test_path, status_code=200)
+    m.post(test_path, status_code=201)
+    m.put(test_path, status_code=202)
+
+    s = Session()
+
+    r_get = s.get(test_path)
+    r_post = s.post(test_path)
+    r_put = s.put(test_path)
+
+    assert r_get.status_code == 200
+    assert r_post.status_code == 201
+    assert r_put.status_code == 202
+
+
+def test_route_set(caplog, m):
+    """
+    Check whether a request having the `route` set, continues to work correctly
+    """
+
+    caplog.set_level(logging.INFO)
+
+    test_path = "https://ovalmoney.com/user"
+    m.get(test_path, status_code=200)
+
+    s = Session()
+    s._logger.info = MagicMock()
+    response = s.get(test_path, route="test/route")
+
+    assert s._logger.info.called
+    assert response.status_code == 200
+
+
+def test_route_plus_custom_header(caplog, m):
+    """
+    Check whether a request having both the `route` and the header set, continues to work correctly
+    """
+
+    caplog.set_level(logging.INFO)
+
+    test_path = "https://ovalmoney.com/user"
+    m.get(test_path, status_code=200)
+
+    s = Session()
+    s._logger.info = MagicMock()
+    response = s.get(test_path, route="test/route", headers={"sweeties": "chocolate"})
+
+    assert s._logger.info.called
+    assert response.status_code == 200
+
+
+def test_custom_header(m):
+    """
+    Check whether a request having the header set, continues to work correctly
+    """
+
+    test_path = "https://ovalmoney.com/user"
+    m.get(test_path, status_code=200)
+
+    s = Session()
+    response = s.get(test_path, headers={"sweeties": "chocolate"})
+
+    assert response.status_code == 200
