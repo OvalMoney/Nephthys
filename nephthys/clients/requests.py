@@ -30,6 +30,7 @@ def catch_logger_exception(function):
 def decorate_log_request(log_record, request):
     log_record.method = request.method
     log_record.url = request.url
+    log_record.route = request.route
 
     if request.headers:
         for name, value in request.headers.items():

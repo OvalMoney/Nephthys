@@ -326,10 +326,13 @@ def test_route_set(caplog, m):
     m.get(test_path, status_code=200)
 
     s = Session()
-    s._logger.info = MagicMock()
-    response = s.get(test_path, route="test/route")
 
-    assert s._logger.info.called
+    route = "test/route"
+    response = s.get(test_path, route=route)
+
+    log = [rec.msg for rec in caplog.records][0]
+
+    assert log["request"]["route"] == route
     assert response.status_code == 200
 
 
@@ -344,10 +347,12 @@ def test_route_plus_custom_header(caplog, m):
     m.get(test_path, status_code=200)
 
     s = Session()
-    s._logger.info = MagicMock()
-    response = s.get(test_path, route="test/route", headers={"sweeties": "chocolate"})
+    route="test/route"
+    response = s.get(test_path, route=route, headers={"sweeties": "chocolate"})
 
-    assert s._logger.info.called
+    log = [rec.msg for rec in caplog.records][0]
+
+    assert log["request"]["route"] == route
     assert response.status_code == 200
 
 
