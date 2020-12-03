@@ -30,7 +30,7 @@ def catch_logger_exception(function):
 def decorate_log_request(log_record, request):
     log_record.method = request.method
     log_record.url = request.url
-    
+
     if hasattr(request, "route"):
         log_record.route = request.route
 
@@ -153,9 +153,9 @@ class NephthysMixin:
 
     def request(self, method, url, **kwargs):
 
-        if "route" in kwargs:
-            route = kwargs.pop("route")
+        route = kwargs.pop("route", None)
 
+        if route is not None:
             if "headers" in kwargs:
                 kwargs["headers"]["X-Route-Header"] = route
             else:
